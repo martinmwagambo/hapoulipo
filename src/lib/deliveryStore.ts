@@ -264,6 +264,18 @@ export async function updateRiderAvailabilityAsync(
   }
 }
 
+export async function deleteRiderByUserIdAsync(userId: string): Promise<void> {
+  const supabase = getSupabase();
+  if (supabase) {
+    try {
+      await supabase.from('delivery_riders').delete().eq('user_id', userId);
+    } catch {}
+  }
+  const riders = loadRiders();
+  const updated = riders.filter((r) => r.userId !== userId && r.id !== userId);
+  saveRiders(updated);
+}
+
 export async function getDeliveryRequestsByRiderAsync(riderId: string): Promise<DeliveryRequest[]> {
   const supabase = getSupabase();
   if (supabase) {
@@ -361,18 +373,133 @@ export async function createDeliveryRequestAsync(
   return newReq;
 }
 
+const MOCK_DELIVERY_REQUESTS: DeliveryRequest[] = [
+  {
+    id: 'del-001',
+    orderId: 'ORD-MOCK-001',
+    riderId: 'rider-001',
+    clientName: 'Amina Wanjiku',
+    clientPhone: '+254712345678',
+    pickupAddress: 'Limuru Fresh Farm Depot, Nairobi',
+    deliveryAddress: 'Westlands, Nairobi',
+    estimatedDistanceKm: 6.4,
+    deliveryFee: 420,
+    status: 'delivered',
+    notes: 'Fragile produce, handle with care.',
+    createdAt: '2026-07-28T09:00:00Z',
+    updatedAt: '2026-07-28T10:15:00Z',
+  },
+  {
+    id: 'del-002',
+    orderId: 'ORD-MOCK-002',
+    riderId: 'rider-002',
+    clientName: 'Brian Kamau',
+    clientPhone: '+254745678901',
+    pickupAddress: 'QuickGrocers Hub, CBD Nairobi',
+    deliveryAddress: 'Kasarani, Nairobi',
+    estimatedDistanceKm: 12.0,
+    deliveryFee: 440,
+    status: 'picked_up',
+    notes: 'Call on arrival at gate.',
+    createdAt: '2026-07-27T14:30:00Z',
+    updatedAt: '2026-07-27T15:00:00Z',
+  },
+  {
+    id: 'del-003',
+    orderId: 'ORD-CLI-002',
+    riderId: 'rider-001',
+    clientName: 'James Otieno',
+    clientPhone: '+254723456789',
+    pickupAddress: 'Kilimani Shopping Center, Nairobi',
+    deliveryAddress: 'Lavington, Nairobi',
+    estimatedDistanceKm: 4.2,
+    deliveryFee: 310,
+    status: 'pending',
+    notes: 'Customer requested fast delivery.',
+    createdAt: '2026-07-29T11:00:00Z',
+    updatedAt: '2026-07-29T11:00:00Z',
+  },
+];
+
 function loadRequests(): DeliveryRequest[] {
-  if (typeof window === 'undefined') return [];
+  if (typeof window === 'undefined') return MOCK_DELIVERY_REQUESTS;
   try {
     const raw = localStorage.getItem(REQUESTS_KEY);
-    return raw ? JSON.parse(raw) : [];
+    if (!raw) {
+      localStorage.setItem(REQUESTS_KEY, JSON.stringify(MOCK_DELIVERY_REQUESTS));
+      return MOCK_DELIVERY_REQUESTS;
+    }
+    return JSON.parse(raw);
   } catch {
-    return [];
+    return MOCK_DELIVERY_REQUESTS;
   }
 }
+
 function saveRequests(requests: DeliveryRequest[]): void {
   if (typeof window === 'undefined') return;
   localStorage.setItem(REQUESTS_KEY, JSON.stringify(requests));
+}
+
+export async function getAllDeliveryRequestsAsync(): Promise<DeliveryRequest[]> {
+  const supabase = getSupabase();
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('delivery_requests')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (!error && data && data.length > 0) {
+        const mapped = data.map((row: any) => ({
+          id: row.id,
+          orderId: row.order_id || '',
+          riderId: row.rider_id,
+          clientName: row.client_name,
+          clientPhone: row.client_phone,
+          pickupAddress: row.pickup_address,
+          pickupLat: row.pickup_lat,
+          pickupLng: row.pickup_lng,
+          deliveryAddress: row.delivery_address,
+          deliveryLat: row.delivery_lat,
+          deliveryLng: row.delivery_lng,
+          estimatedDistanceKm: row.estimated_distance_km,
+          deliveryFee: row.delivery_fee,
+          status: row.status,
+          notes: row.notes,
+          createdAt: row.created_at,
+          updatedAt: row.updated_at,
+        }));
+        saveRequests(mapped);
+        return mapped;
+      }
+    } catch {}
+  }
+  return loadRequests().sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+}
+
+export async function updateDeliveryRequestStatusAsync(
+  requestId: string,
+  status: DeliveryRequest['status']
+): Promise<boolean> {
+  const supabase = getSupabase();
+  if (supabase) {
+    try {
+      await supabase
+        .from('delivery_requests')
+        .update({ status, updated_at: new Date().toISOString() })
+        .eq('id', requestId);
+    } catch {}
+  }
+  const requests = loadRequests();
+  const idx = requests.findIndex((r) => r.id === requestId);
+  if (idx !== -1) {
+    requests[idx].status = status;
+    requests[idx].updatedAt = new Date().toISOString();
+    saveRequests(requests);
+    return true;
+  }
+  return false;
 }
 
 export function calculateDeliveryFee(rider: DeliveryRider, distanceKm: number): number {

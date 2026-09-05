@@ -233,6 +233,56 @@ export async function getClientOrdersAsync(buyerEmail: string): Promise<VendorOr
   return MOCK_CLIENT_ORDERS;
 }
 
+export async function getAllOrdersAsync(): Promise<VendorOrder[]> {
+  const supabase = getSupabase();
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('vendor_orders')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (!error && data && data.length > 0) {
+        const orders = data.map(mapOrderRow);
+        try {
+          localStorage.setItem(VENDOR_ORDERS_KEY, JSON.stringify(orders));
+        } catch {}
+        return orders;
+      }
+    } catch (e) {
+      console.warn('getAllOrdersAsync Supabase error:', e);
+    }
+  }
+
+  try {
+    const rawVendor = localStorage.getItem(VENDOR_ORDERS_KEY);
+    const rawClient = localStorage.getItem(CLIENT_ORDERS_KEY);
+    const combined: VendorOrder[] = [];
+    if (rawVendor) {
+      combined.push(...JSON.parse(rawVendor));
+    } else {
+      combined.push(...MOCK_ORDERS);
+    }
+    if (rawClient) {
+      const clientOrders: VendorOrder[] = JSON.parse(rawClient);
+      clientOrders.forEach((co) => {
+        if (!combined.some((o) => o.orderId === co.orderId)) {
+          combined.push(co);
+        }
+      });
+    } else {
+      MOCK_CLIENT_ORDERS.forEach((co) => {
+        if (!combined.some((o) => o.orderId === co.orderId)) {
+          combined.push(co);
+        }
+      });
+    }
+    return combined.sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  } catch {}
+  return [...MOCK_ORDERS, ...MOCK_CLIENT_ORDERS];
+}
+
 export async function updateOrderStatusAsync(
   orderId: string,
   status: VendorOrderStatus,
