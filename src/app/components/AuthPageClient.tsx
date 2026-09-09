@@ -30,7 +30,9 @@ export default function AuthPageClient({ initialTab }: AuthPageClientProps) {
         {/* Brand Panel */}
         <div
           className="hidden lg:flex lg:w-[45%] flex-col justify-between p-10 relative overflow-hidden"
-          style={{ backgroundColor: '#1a2744' }}
+          style={{
+            background: 'radial-gradient(circle at 18% 12%, rgba(255,255,255,0.05), transparent 42%), #1a2744',
+          }}
         >
           {/* Decorative circles */}
           <div className="absolute top-[-80px] right-[-80px] w-64 h-64 rounded-full bg-white/5" />
@@ -111,7 +113,9 @@ export default function AuthPageClient({ initialTab }: AuthPageClientProps) {
           {/* Mobile header */}
           <div
             className="lg:hidden flex items-center gap-3 px-6 pt-8 pb-4"
-            style={{ backgroundColor: '#1a2744' }}
+            style={{
+              background: 'radial-gradient(circle at 18% 12%, rgba(255,255,255,0.05), transparent 42%), #1a2744',
+            }}
           >
             <AppLogo size={40} className="rounded-lg overflow-hidden" />
             <div>
@@ -151,13 +155,6 @@ export default function AuthPageClient({ initialTab }: AuthPageClientProps) {
                 <SignupForm onSwitchToLogin={() => setTab('login')} />
               )}
             </div>
-          </div>
-
-          {/* Footer */}
-          <div className="text-center py-4 px-6">
-            <p className="text-xs text-muted-foreground">
-              © 2026 Hapo Ulipo Services. Made with 💚 for Kenya.
-            </p>
           </div>
         </div>
       </div>
