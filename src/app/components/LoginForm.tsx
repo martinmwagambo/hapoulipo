@@ -157,6 +157,22 @@ export default function LoginForm({ onSwitchToSignup }: LoginFormProps) {
         </button>
       </form>
 
+      <div className="flex items-center gap-3 my-5" aria-hidden="true">
+        <span className="h-px flex-1 bg-border" />
+        <span className="text-xs text-muted-foreground whitespace-nowrap">or continue with</span>
+        <span className="h-px flex-1 bg-border" />
+      </div>
+
+      <button
+        type="button"
+        className="w-full min-h-[48px] flex items-center justify-center gap-2 rounded-md border border-border bg-background py-3 text-base text-card-foreground transition-colors hover:bg-muted"
+      >
+        <span className="text-lg font-bold text-primary" aria-hidden="true">
+          G
+        </span>
+        Sign in with Google
+      </button>
+
       <p className="text-center text-sm text-muted-foreground mt-5">
         New to HapoUlipo?{' '}
         <button onClick={onSwitchToSignup} className="text-primary font-semibold hover:underline">
