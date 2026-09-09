@@ -22,6 +22,7 @@ import { getCartItems } from '@/lib/cartStore';
 
 export default function DashboardNav() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const router = useRouter();
   const { signOut } = useAuth();
@@ -86,8 +87,10 @@ export default function DashboardNav() {
       <div className="flex items-center gap-3">
         {/* Notification bell */}
         <button
+          onClick={() => setNotificationsOpen((value) => !value)}
           className="relative p-2 rounded-xl text-white/70 hover:text-white hover:bg-white/10 transition-all duration-150"
           aria-label="Notifications"
+          aria-expanded={notificationsOpen}
         >
           <Bell size={20} />
           <span
@@ -95,6 +98,21 @@ export default function DashboardNav() {
             style={{ backgroundColor: '#f07c2a' }}
           />
         </button>
+        {notificationsOpen && (
+          <div className="absolute right-24 top-14 z-50 w-72 rounded-2xl border border-border bg-card p-4 text-card-foreground card-shadow-md">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-bold">Notifications</p>
+              <button
+                type="button"
+                onClick={() => setNotificationsOpen(false)}
+                className="text-xs font-semibold text-muted-foreground hover:text-foreground"
+              >
+                Close
+              </button>
+            </div>
+            <p className="mt-4 text-sm text-muted-foreground">You have no new notifications.</p>
+          </div>
+        )}
 
         {user?.role === 'client' && (
           <button

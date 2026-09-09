@@ -39,6 +39,33 @@ const featureList = [
 
 export default function HomePage() {
   const [darkMode, setDarkMode] = useState(false);
+  const [audience, setAudience] = useState<'client' | 'vendor' | 'ambassador'>('client');
+
+  const audienceContent = {
+    client: {
+      label: 'Clients',
+      title: 'Find what you need, close to home.',
+      description: 'Browse trusted local vendors, add essentials to your cart, and get them delivered when it suits you.',
+      action: 'Start shopping',
+      href: '/auth?tab=signup',
+    },
+    vendor: {
+      label: 'Vendors',
+      title: 'Put your products in front of nearby customers.',
+      description: 'List your catalogue, reach more people in your area, and grow your local business with every order.',
+      action: 'Join as a vendor',
+      href: '/auth?tab=signup',
+    },
+    ambassador: {
+      label: 'Ambassadors',
+      title: 'Build your network and earn from every referral.',
+      description: 'Connect quality vendors with Hapo Ulipo and track the value you create in your community.',
+      action: 'Become an ambassador',
+      href: '/auth?tab=signup',
+    },
+  } as const;
+
+  const selectedAudience = audienceContent[audience];
 
   useEffect(() => {
     const savedTheme = window.localStorage.getItem('hapo-theme');
@@ -263,18 +290,32 @@ export default function HomePage() {
       </section>
 
       <section id="get-started" className="mx-auto max-w-7xl px-6 pb-24 sm:px-8 lg:px-12">
-        <div className="rounded-[2.5rem] bg-gradient-to-r from-primary to-[#1e6b3a] px-8 py-16 text-white shadow-card-shadow-lg sm:px-12">
+        <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-r from-primary to-[#1e6b3a] px-8 py-16 text-white shadow-card-shadow-lg sm:px-12">
+          <div className="absolute left-8 right-8 top-0 h-px bg-white/30" aria-hidden="true" />
+          <div className="relative mb-10 flex flex-wrap items-center gap-2 border-b border-white/20 pb-4">
+            <span className="mr-3 text-sm font-semibold uppercase tracking-[0.25em] text-[#b7e8c7]">
+              How to get started
+            </span>
+            {Object.entries(audienceContent).map(([key, value]) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => setAudience(key as typeof audience)}
+                className={`rounded-full px-4 py-2 text-sm font-semibold transition ${audience === key ? 'bg-white text-[#1e6b3a]' : 'text-white/75 hover:bg-white/10 hover:text-white'}`}
+                aria-pressed={audience === key}
+              >
+                {value.label}
+              </button>
+            ))}
+          </div>
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl space-y-4">
               <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#b7e8c7]">
                 Ready to move?
               </p>
-              <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">
-                Launch your first order in under 60 seconds.
-              </h2>
+              <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">{selectedAudience.title}</h2>
               <p className="text-base leading-7 text-[#def5d8]">
-                Join the local movement and get daily essentials delivered from trusted partners
-                nearby. Perfect for busy homes, workers, and small businesses.
+                {selectedAudience.description}
               </p>
               <div className="flex flex-wrap gap-3 text-sm text-[#def5d8]">
                 <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5">
@@ -287,10 +328,10 @@ export default function HomePage() {
             </div>
             <div className="flex flex-col gap-4 sm:flex-row">
               <Link
-                href="/auth?tab=login"
+                href={selectedAudience.href}
                 className="btn-primary inline-flex items-center justify-center gap-2"
               >
-                Order now <ArrowRight size={18} />
+                {selectedAudience.action} <ArrowRight size={18} />
               </Link>
               <Link
                 href="#"

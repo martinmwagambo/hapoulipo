@@ -30,6 +30,21 @@
   --green: #2d8a4e;
 }
 
+.dark {
+  --background: #0f172a;
+  --foreground: #e5e7eb;
+  --secondary: #173b2a;
+  --secondary-foreground: #b7e8c7;
+  --accent: #422615;
+  --accent-foreground: #fdba74;
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+  --card: #172033;
+  --card-foreground: #f8fafc;
+  --border: #334155;
+  --input: #334155;
+}
+
 @layer base {
   * {
     box-sizing: border-box;
@@ -161,7 +176,7 @@
   }
 
   .input-field {
-    @apply w-full px-4 py-3 rounded-xl border border-input bg-white text-card-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all duration-150;
+    @apply w-full px-4 py-3 rounded-xl border border-input bg-card text-card-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all duration-150;
   }
 
   .input-error {

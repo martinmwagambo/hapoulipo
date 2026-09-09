@@ -159,7 +159,7 @@ export default function SignupForm({ onSwitchToLogin }: SignupFormProps) {
                     className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 text-center transition-all duration-150 ${
                       field.value === option.value
                         ? 'border-primary bg-accent/40 text-primary'
-                        : 'border-border bg-white text-muted-foreground hover:border-green-300 hover:bg-green-50'
+                        : 'border-border bg-card text-muted-foreground hover:border-green-300 hover:bg-green-50 dark:hover:bg-green-950/30'
                     }`}
                   >
                     <span
@@ -351,6 +351,22 @@ export default function SignupForm({ onSwitchToLogin }: SignupFormProps) {
           )}
         </button>
       </form>
+
+      <div className="my-5 flex items-center gap-3" aria-hidden="true">
+        <span className="h-px flex-1 bg-border" />
+        <span className="whitespace-nowrap text-xs text-muted-foreground">or continue with</span>
+        <span className="h-px flex-1 bg-border" />
+      </div>
+
+      <button
+        type="button"
+        className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-md border border-border bg-background py-3 text-base text-card-foreground transition-colors hover:bg-muted"
+      >
+        <span className="text-lg font-bold text-primary" aria-hidden="true">
+          G
+        </span>
+        Sign up with Google
+      </button>
 
       <p className="text-center text-sm text-muted-foreground mt-5">
         Already have an account?{' '}

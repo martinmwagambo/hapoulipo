@@ -13,6 +13,7 @@ import {
   Bike,
   MapPin,
   Package,
+  ShoppingBag,
 } from 'lucide-react';
 import DashboardNav from '@/components/DashboardNav';
 import { getAuthUser } from '@/lib/authStore';
@@ -135,7 +136,29 @@ function CheckoutInner() {
   }, [wantsDelivery, selectedRiderId, item, availableRiders, user]);
 
   if (!user) return null;
-  if (!item && cartItems.length === 0) return null;
+  if (!item && cartItems.length === 0) {
+    return (
+      <div className="min-h-screen bg-background">
+        <DashboardNav />
+        <main className="mx-auto flex max-w-2xl flex-col items-center px-4 py-20 text-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted text-muted-foreground">
+            <ShoppingBag size={28} />
+          </div>
+          <h1 className="mt-5 text-2xl font-bold text-card-foreground">Your cart is empty</h1>
+          <p className="mt-2 max-w-sm text-sm text-muted-foreground">
+            Add products from nearby vendors and they will appear here before checkout.
+          </p>
+          <button
+            type="button"
+            onClick={() => router.push('/client-home')}
+            className="btn-primary mt-6"
+          >
+            Browse products
+          </button>
+        </main>
+      </div>
+    );
+  }
 
   const totalAmount = cartItems.reduce((sum, entry) => sum + entry.price_kes * entry.quantity, 0);
   const ambassadorUser = user.referred_by ? mockUsers.find((u) => u.id === user.referred_by) : null;
